@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'MainApp',
     'django_extensions'
-    'allauth',
-    'allauth.account',
 ]
 
 MIDDLEWARE = [
