@@ -2,11 +2,11 @@
 
 
 {% block content %}
-<!-- Begin page content -->
 
+<!-- Begin page content -->
 <div class="container">
     <div class="row">
-        <div class="col">
+        <div class="col text-center">
             <h1>{{ pagename }}</h1>
             <hr>
         </div>
@@ -14,63 +14,52 @@
 
     <div class="row">
         <div class="col">
-        {% if type == 'view' %}    
-        <fieldset disabled>
-        <div class="row disabled">
-            <div class="col col-6">
-                Название: <input type="text" value="{{ snippet.name }}" class="form-control">
-            </div>
-            <div class="col col-2">
-                Язык:<input type="text" value="{{ snippet.lang }}" class="form-control">
-            </div>
-            <div class="col col-4">
-                Дата создания:<input type="text" value="{{ snippet.creation_date }}" class="form-control">
-            </div>
-        </div>
-
-        <hr>
-        <div class="row">
-            <div class="col">
-                <div class="p-2 h-100" style="border:1px solid #ced4da; border-radius:5px;">
-                    <p>
-                        {{ snippet.code }}
-                    </p>
-
-                </div>
-
-            </div>
-        </div>
-        </fieldset>
-        {% elif type == 'edit' %}
-        <form action ="" method='post'>
-            {% csrf_token %}
-            <div class="row">
-                <div class="col col-6">
-                    Название: <input name='name' type="text" value="{{ snippet.name }}" class="form-control">
-                </div>
-                <div class="col col-2">
-                    Язык:<input name='lang' type="text" value="{{ snippet.lang }}" class="form-control">
-                </div>
-                <div class="col col-4">
-                    Дата создания:<input name='creation_date' type="text" value="{{ snippet.creation_date }}" class="form-control">
-                </div>
-            </div>
-
+            <p>На данной страницы будут отображаться все созданные сниппеты.</p>
+            <p>Пока тут просто пример, но скоро заменим реальными сниппетами из БД!</p>
             <hr>
-            <div class="row">
-                <div class="col">
-                    <div class="p-2 h-100" style="border:1px solid #ced4da; border-radius:5px;">
-                        <textarea name="code">
-                            {{ snippet.code }}
-                        </textarea>
+        </div>
+    </div>
 
-                    </div>
-
-                </div>
+    <div class="row">
+        <div class="col">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Название</th>
+                    <th scope="col">Дата создания</th>
+                    <th scope="col">Пользователь</th>
+                    <th scope="col">Публичный</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for snippet in snippets %}
+                    <tr>
+                        <td scope="row">{{ snippet.id }}</td>
+                        <td><a href="{% url 'snippet-detail' snippet.id %}">{{ snippet.name }}</a>
+                            {% if request.user == snippet.user %}
+                            <a href="{% url 'snippet-delete' snippet.id %}">
+                                <i style="color: red" class="fa-solid fa-trash"></i>
+                            </a>
+                            <a href="{% url 'snippet-edit' snippet.id %}">
+                                <i style="color: red" class="fas fa-edit"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td>{{ snippet.creation_date }}</td>
+                        <td>{{ snippet.user.username }}</td>
+                        {% if snippet.public %}
+                            <td>Публичный</td>
+                        {% else %}
+                            <td>Приватный</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div align="right">
+                <i style="color: gray;">Всего сниппетов: 2</i>
             </div>
-            <button type="submit"> Обновить </button>
-        </form>
-        {% endif %}
         </div>
     </div>
 </div>

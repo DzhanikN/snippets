@@ -1,7 +1,7 @@
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from MainApp.models import Snippet
-from MainApp.forms import SnippetForm
+from MainApp.forms import SnippetForm, UserRegistrationForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
@@ -10,6 +10,17 @@ from django.contrib import auth
 def index_page(request):
     context = {'pagename': 'PythonBin'}
     return render(request, 'pages/index.html', context)
+
+
+@login_required
+def my_snippets(request):
+    snippets = Snippet.objects.filter(user=request.user)
+    context = {
+        'pagename': 'Мои сниппеты',
+        'snippets': snippets
+        }
+    return render(request, 'pages/view_snippets.html', context)
+
 
 @login_required
 def add_snippet_page(request):
@@ -34,7 +45,7 @@ def add_snippet_page(request):
         return render(request,'pages/add_snippet.html', {'form': form})
 
 def snippets_page(request):
-    snippets = Snippet.objects.all()
+    snippets = Snippet.objects.filter(public=True)
     context = {
         'pagename': 'Просмотр сниппетов',
         'snippets': snippets
@@ -82,8 +93,24 @@ def snippet_edit(request, snippet_id):
         snippet.lang = data_form["lang"]
         snippet.code = data_form["code"]
         snippet.creation_date = data_form["creation_date"]
+        snippet.public = data_form.get("public", False)
         snippet.save()
         return redirect("snippets-list")
+
+
+def create_user(request):
+    context = {"pagename": "Регистрация пользователя"}
+    if request.method == "GET":
+        form = UserRegistrationForm()
+        context["form"] = form
+        return render(request, "pages/registration.html", context)
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+        context['form'] = form
+        return render(request, "pages/registration.html", context)
 
 
 def login(request):
